@@ -1,0 +1,23 @@
+
+# Model Building
+
+input_layer = Input(shape=(max_seq_len,))
+embedding_layer = Embedding(input_dim=max_vocab_size, output_dim=100)(input_layer)
+bi_lstm = Bidirectional(LSTM(300, return_sequences=True))(embedding_layer)
+
+attention = AttentionWithContext()(bi_lstm)
+added = Addition()(attention)
+
+dense1 = Dense(300)(added)
+act1 = LeakyReLU()(dense1)
+drop1 = Dropout(0.5)(act1)
+dense2 = Dense(300)(drop1)
+act2 = LeakyReLU()(dense2)
+drop2 = Dropout(0.5)(act2)
+output_layer = Dense(num_classes, activation='softmax')(drop2)
+
+model = Model(inputs=input_layer, outputs=output_layer)
+
+model.compile(optimizer=Adamax(learning_rate=0.002),
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
