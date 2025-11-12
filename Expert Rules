@@ -1,0 +1,63 @@
+For Reentrancy vulnerabilities, we used two detection pat-
+terns: CALLValueInvocation to identify the presence of
+call.value instructions, and RepeatedCallValue to
+detect repetitive call sequences. A function was labeled as
+vulnerable if it satisfied the condition:
+
+CALLValueInvocation ∧ RepeatedCallValue
+
+Timestamp Dependency vulnerabilities were detected
+using three patterns: TSInvocation (detection of
+block.timestamp), TSContaminate (timestamp
+propagation into branch or comparison logic), and TSRandom
+timestamp use as a randomness seed). Vulnerability labeling
+followed the rule:
+
+TSInvocation ∨ (TSContaminate ∧ TSRandom)
+
+For Dangerous Delegatecall vulnerabilities, we employed three
+patterns: DGInvocation (invocation of delegatecall),
+DGCallConstraint (absence of access restrictions), and
+DGParameter (external parameter inclusion). A function
+was marked as vulnerable when it fulfilled:
+
+DGInvocation∧¬DGCallConstraint∧DGParameter
+
+Integer Overflow/Underflow conditions were labeled using
+the OFStackTruncate pattern, which captures arithmetic
+operations (ADD, SUB, MUL) where stack truncation is likely
+due to exceeding the bounds of the EVM’s 256-bit unsigned
+integers.
+
+For Unchecked Low-Level Calls, the pattern combines
+low-level transfer invocations (call or send) with the ab-
+sence of return-value validation. Vulnerability is confirmed
+when:
+
+(Call ∨ Send) ∧ ¬SuccessCheck
+
+For Denial-of-Service (DoS) vulnerabilities, detection relies
+on the coexistence of an external call within an unbounded or
+user-driven loop. The corresponding rule is:
+
+ExternalCall ∧ UnboundedLoop
+
+For Block Number Dependency, vulnerability arises when
+block.number is employed as an entropy source or as a
+critical decision variable rather than for scheduling purposes:
+BlockNumberUsage∧(EntropySource∨CriticalDecision)
+For Tx.origin Misuse, the vulnerability is marked when
+tx.origin is used directly for authentication instead of
+msg.sender:
+
+TxOrigin ∧ UsedForAuthentication
+
+A function is labeled as vulnerable to Ether freezing when
+it satisfies the following condition:
+
+DGInvocation ∧ ¬FETransfer
+
+A function is labeled as vulnerable to dangerous Ether strict
+equality when it satisfies the combined condition:
+
+EDInvocation ∧ EDContaminate
